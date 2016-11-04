@@ -104,6 +104,7 @@ JUnit 默认会为每一个 TestCase 启动一个 MySQL 服务器，结束时关
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
                 <configuration>
                     <properties>
                         <property>
