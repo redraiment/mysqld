@@ -5,11 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -206,6 +211,40 @@ public final class Mysqld implements AutoCloseable {
             mysql.start(THREAD_NAME, options);
             waitForReady();
             log.info("embedded mysql server started");
+            initialize();
+        }
+    }
+
+    /**
+     * 初始化。
+     *
+     * 如果有执行 PROPERTY_INIT，则执行相应的初始化脚本
+     */
+    void initialize() {
+        String spec = System.getProperty(PROPERTY_INIT);
+        if (spec == null) {
+            return;
+        }
+
+        StringBuilder sql = new StringBuilder();
+        final String endl = System.getProperty("line.separator");
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(spec);
+             Scanner sin = new Scanner(in)) {
+            while (sin.hasNextLine()) {
+                sql.append(sin.nextLine())
+                   .append(endl);
+            }
+        } catch (Throwable e) {
+            log.warn("read sql file failed", e);
+            return;
+        }
+
+        String url = "jdbc:mysql://localhost:%d/?useSSL=false&allowMultiQueries=true&characterEncoding=UTF-8";
+        try (Connection connection = DriverManager.getConnection(String.format(url, port), "root", "");
+             Statement statement = connection.createStatement()) {
+            statement.execute(sql.toString());
+        } catch (Throwable e) {
+            log.warn("initialize mysql server failed", e);
         }
     }
 
