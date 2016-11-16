@@ -27,14 +27,29 @@ import java.util.Set;
 public final class Mysqld implements AutoCloseable {
 
     /**
+     * ROOT的系统属性名
+     */
+    public final static String PROPERTY_ROOT = "zzp.mysqld.root";
+
+    /**
      * 存放 MySQL 二进制文件的默认路径为当前路径下的 mysqld 文件夹
      */
     public final static String DEFAULT_ROOT = "mysqld";
 
     /**
+     * PORT的系统属性名
+     */
+    public final static String PROPERTY_PORT = "zzp.mysqld.port";
+
+    /**
      * 端口默认为 3306，与 MySQL 默认端口保持一致
      */
     public final static int DEFAULT_PORT = 3306;
+
+    /**
+     * INIT的系统属性名
+     */
+    public final static String PROPERTY_INIT = "zzp.mysqld.init";
 
     /**
      * 线程名称默认为 mysqld-thread
@@ -80,7 +95,7 @@ public final class Mysqld implements AutoCloseable {
         if (!sharedPorts.isEmpty()) {
             port = sharedPorts.iterator().next();
         } else {
-            port = Integer.parseInt(System.getProperty("zzp.mysqld.port", Integer.toString(DEFAULT_PORT)));
+            port = Integer.parseInt(System.getProperty(PROPERTY_PORT, Integer.toString(DEFAULT_PORT)));
         }
         return start(port);
     }
@@ -100,7 +115,7 @@ public final class Mysqld implements AutoCloseable {
      * @return MySQL 服务器实例
      */
     public static Mysqld start(int port) {
-        return start(System.getProperty("zzp.mysqld.root", DEFAULT_ROOT), port);
+        return start(System.getProperty(PROPERTY_ROOT, DEFAULT_ROOT), port);
     }
 
     /**

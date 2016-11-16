@@ -34,8 +34,8 @@ public class MysqldRunListener extends RunListener {
     public void testRunStarted(Description description) throws Exception {
         log.debug("on junit run started: start embedded mysql server");
 
-        String root = System.getProperty("embedded.mysql.root", Mysqld.DEFAULT_ROOT);
-        String port = System.getProperty("embedded.mysql.port", Integer.toString(Mysqld.DEFAULT_PORT));
+        String root = System.getProperty(Mysqld.PROPERTY_ROOT, Mysqld.DEFAULT_ROOT);
+        String port = System.getProperty(Mysqld.PROPERTY_PORT, Integer.toString(Mysqld.DEFAULT_PORT));
         mysql = new Mysqld(root, Integer.parseInt(port), true);
         mysql.run();
     }
